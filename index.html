@@ -490,9 +490,7 @@ p {
 
 <!-- Keep the music OUTSIDE all five screens.
      Replace order5.mpeg if your audio filename is different. -->
-<audio id="music" loop preload="auto">
-  <source src="order5.mpeg" type="audio/mpeg">
-</audio>
+<audio id="music" loop preload="auto"></audio>
 
 <button class="music-control" id="musicButton" onclick="toggleMusic()">
   ♫ Music: Off
@@ -550,17 +548,17 @@ p {
 
     <div class="photo-grid">
       <div class="polaroid">
-        <img src="order5 image1.jpeg" alt="Her photo 1">
+        <img id="image1" alt="Her photo 1">
         <div class="caption">A moment to remember ♡</div>
       </div>
 
       <div class="polaroid">
-        <img src="order5 image2.jpeg" alt="Her photo 2">
+        <img id="image2" alt="Her photo 2">
         <div class="caption">Random smiles ✨</div>
       </div>
 
       <div class="polaroid">
-        <img src="order5 image3.jpeg" alt="Her photo 3">
+        <img id="image3" alt="Her photo 3">
         <div class="caption">One for the memories 🌸</div>
       </div>
     </div>
@@ -733,6 +731,7 @@ p {
   </div>
 </section>
 
+<script src="crypto.js"></script>
 <script>
 const music = document.getElementById("music");
 const musicButton = document.getElementById("musicButton");
@@ -777,11 +776,28 @@ function toggleMusic() {
   }
 }
 
-function nextScreen(number) {
+async function nextScreen(number) {
   /*
     Start music on the first navigation tap if it hasn't started.
     Once playing, navigation never resets the song's current time.
   */
+  if(number == 2){
+    try {
+        for (let i = 1; i < 4; i++) {
+          const decrypted = await decryptFile("put-secret-password-here", `enc/image${i}.bin`);
+          const blob = new Blob([decrypted]);
+          document.getElementById(`image${i}`).src = URL.createObjectURL(blob);
+        }
+
+        const musicData = await decryptFile("put-secret-password-here", "enc/music.bin");
+        document.getElementById("music").src = URL.createObjectURL(new Blob([musicData]));
+
+      } catch (e) {
+        console.log(e)
+        console.log("Error!")
+      }
+  }
+
   if (!musicHasStarted) {
     startMusic();
   }
